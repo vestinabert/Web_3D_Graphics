@@ -147,7 +147,6 @@ var createScene = function () {
 
     scene.freezeActiveMeshes(true);
 
-
     // Mouse interaction for particle movement
     var mouseX;
     var mouseY;
@@ -156,6 +155,25 @@ var createScene = function () {
         mouseY = scene.pointerY - window.innerHeight * 0.5;
         updateParticles();
     })
+
+    // Balloon mesh creation and animation
+    var balloon = BABYLON.Mesh.CreateSphere("balloon", 10, 1.0, scene);
+    balloon.material = new BABYLON.StandardMaterial("matBallon", scene);
+    balloon.position = new BABYLON.Vector3(0, -3, 0);
+
+    var alpha = Math.PI;
+    scene.registerBeforeRender(function () {
+
+        if (balloon.intersectsMesh(cylinder3, false)) {
+            balloon.material.diffuseColor = new BABYLON.Color3(0.36, 0, 0);
+        } else {
+            balloon.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
+        }
+
+        alpha += 0.08;
+        balloon.position.y += Math.cos(alpha) / 20;
+        
+    });
     
     return scene;
 };
