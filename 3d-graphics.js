@@ -174,6 +174,12 @@ var createScene = function () {
         balloon.position.y += Math.cos(alpha) / 20;
         
     });
+
+    // Event handling for the balloon mesh
+    balloon.actionManager = new BABYLON.ActionManager(scene);
+    balloon.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
+        alert('trying to connect');
+    }));
     
     return scene;
 };
