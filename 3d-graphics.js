@@ -77,6 +77,85 @@ var createScene = function () {
     BABYLON.SceneLoader.ImportMesh("", Assets.meshes.ufo.rootUrl, Assets.meshes.ufo.filename, scene, function (meshes) {
         meshes[0].position.y = 0.8;
     });
+
+    // Mirrow material setup
+    var shapeMaterial = new BABYLON.StandardMaterial("mat", scene);
+    shapeMaterial.backFaceCulling = true;
+    shapeMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
+    shapeMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.CUBIC_MODE;
+    shapeMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    shapeMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+     // Particle system setup
+    var particleNb = 1000;
+    var poly = new BABYLON.MeshBuilder.CreatePolyhedron('p', {type: 2, size: 1.0}, scene)
+    poly.isVisible = false;
+    poly.manualUpdateOfWorldMatrixInstancedBuffer = true;
+    
+    poly.material = shapeMaterial;
+    
+    var particles = [];                 // instances array
+    var logicalParticles = [];          // instance data array
+    for (var i = 0; i < particleNb; i++) {
+        var particle = poly.createInstance("i" + i);
+        particle.isPickable = false;
+        particles.push(particle);
+        var t = Math.random() * 100.0;
+        var factor = 20.0 + Math.random() * 100.0;
+        var speed = 0.01 + Math.random() / 800.0;
+        var xFactor = -50.0 + Math.random() * 100.0;
+        var yFactor = -50.0 + Math.random() * 100.0;
+        var zFactor = -50.0 + Math.random() * 100.0;
+        var data = {t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0, mat: new BABYLON.Matrix(), quat: new BABYLON.Quaternion()}
+        logicalParticles.push(data);
+    }
+
+    var updateParticles = function() {
+        var offset = 0;
+        let instancedBuffer = poly.worldMatrixInstancedBuffer;
+        
+        if (!instancedBuffer) {
+            return;
+        }
+        logicalParticles.forEach((particle, i) => {
+            // logical particle
+            let { t, factor, speed, xFactor, yFactor, zFactor, mat, quat } = particle
+            t = particle.t += speed / 2
+            const a = Math.cos(t) + Math.sin(t * 1) / 10
+            const b = Math.sin(t) + Math.cos(t * 2) / 10
+            const s = Math.cos(t)
+            particle.mx += (mouseX - particle.mx) * 0.01
+            particle.my += (mouseY * -1 - particle.my) * 0.01
+
+            // instance
+            var p = particles[i];
+            var pos = p.position;
+            pos.x = (particle.mx / 10) * a + xFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 1) * factor) / 10;
+            pos.y = (particle.my / 10) * b + yFactor + Math.sin((t / 10) * factor) + (Math.cos(t * 2) * factor) / 10;
+            pos.z = (particle.my / 10) * b + zFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 3) * factor) / 10;
+            var scl = p.scaling;
+            scl.x = scl.y = scl.z = Math.abs(s);
+            var r = s * 5.0;
+
+            BABYLON.Quaternion.RotationYawPitchRollToRef(r, r, r, quat);
+            BABYLON.Matrix.ComposeToRef(scl, quat, pos, mat);
+
+            instancedBuffer.set(mat.m, offset);
+            offset += 16;
+        });
+    }
+
+    scene.freezeActiveMeshes(true);
+
+
+    // Mouse interaction for particle movement
+    var mouseX;
+    var mouseY;
+    scene.registerBeforeRender(function() {
+        mouseX = scene.pointerX - window.innerWidth * 0.5;
+        mouseY = scene.pointerY - window.innerHeight * 0.5;
+        updateParticles();
+    })
     
     return scene;
 };
