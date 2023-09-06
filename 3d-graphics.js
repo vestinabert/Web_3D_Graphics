@@ -56,6 +56,13 @@ var createScene = function () {
     cylinder3.scaling = new BABYLON.Vector3(0.6, 1, 0.6);
     cylinder2.receiveShadows = false;
     cylinder3.receiveShadows = false;
+
+    // Shadow generation setup
+    var sg = new BABYLON.ShadowGenerator(1024, light);
+    sg.usePercentageCloserFiltering = true;
+    sg.addShadowCaster(sphere);
+    sg.enableSoftTransparentShadow = true;
+    sg.transparencyShadow = true;
     
     return scene;
 };
