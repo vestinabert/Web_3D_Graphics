@@ -180,6 +180,35 @@ var createScene = function () {
     balloon.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
         alert('trying to connect');
     }));
+
+    // Creation of glass planes with reflective surfaces
+    for(var i=0; i<4; i++) {
+		var glass = BABYLON.MeshBuilder.CreatePlane("glass", {width: 5, height: 5}, scene);
+		glass.position = new BABYLON.Vector3(((i<2) - 0.5)*12*((i%2) == 1), 0, ((i<2) - 0.5)*12*((i%2) == 0));
+		glass.rotation = new BABYLON.Vector3(0, i * Math.PI / 2, 0);
+	
+		//Ensure working with new values for glass by computing and obtaining its worldMatrix
+		glass.computeWorldMatrix(true);
+		var glass_worldMatrix = glass.getWorldMatrix();
+	
+		//Obtain normals for plane and assign one of them as the normal
+  		var glass_vertexData = glass.getVerticesData("normal");
+		var glassNormal = new BABYLON.Vector3(glass_vertexData[0], glass_vertexData[1], glass_vertexData[2]);	
+		//Use worldMatrix to transform normal into its current value
+		glassNormal = BABYLON.Vector3.TransformNormal(glassNormal, glass_worldMatrix)
+	
+		//Create reflecting surface for mirror surface
+		var reflector = BABYLON.Plane.FromPositionAndNormal(glass.position, glassNormal.scale(-1));
+
+		//Create the mirror material
+		var mirrorMaterial = new BABYLON.StandardMaterial("mirror", scene);
+		mirrorMaterial.reflectionTexture = new BABYLON.MirrorTexture("mirror", 1024, scene, true);
+		mirrorMaterial.reflectionTexture.mirrorPlane = reflector;
+		mirrorMaterial.reflectionTexture.renderList = [sphere, shape, cylinder2, cylinder3];
+		mirrorMaterial.reflectionTexture.level = 1;
+	
+		glass.material = mirrorMaterial;
+	}
     
     return scene;
 };
