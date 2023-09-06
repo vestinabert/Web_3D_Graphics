@@ -46,6 +46,16 @@ var createScene = function () {
     var shape = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.3, diameter: 4 });
     shape.material = grass;
     shape.receiveShadows = true;
+
+    // Clone cylinders at different positions
+    const cylinder2 = shape.clone("cylinder2");
+    cylinder2.position.y = -1;
+    cylinder2.scaling = new BABYLON.Vector3(0.8, 1, 0.8);
+    const cylinder3 = shape.clone("cylinder3");
+    cylinder3.position.y = -2;
+    cylinder3.scaling = new BABYLON.Vector3(0.6, 1, 0.6);
+    cylinder2.receiveShadows = false;
+    cylinder3.receiveShadows = false;
     
     return scene;
 };
