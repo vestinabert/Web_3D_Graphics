@@ -72,6 +72,11 @@ var createScene = function () {
         sphere.rotation.z = Math.sin(2 * k);
         k += 0.01;
     });
+
+    // Mesh loading
+    BABYLON.SceneLoader.ImportMesh("", Assets.meshes.ufo.rootUrl, Assets.meshes.ufo.filename, scene, function (meshes) {
+        meshes[0].position.y = 0.8;
+    });
     
     return scene;
 };
