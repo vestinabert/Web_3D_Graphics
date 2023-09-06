@@ -63,6 +63,15 @@ var createScene = function () {
     sg.addShadowCaster(sphere);
     sg.enableSoftTransparentShadow = true;
     sg.transparencyShadow = true;
+
+    // Sphere movement animation
+    let k = 0;
+    scene.onBeforeRenderObservable.add(() => {
+        sphere.rotation.x = Math.cos(k);
+        sphere.rotation.y = 2 * Math.sin(k);
+        sphere.rotation.z = Math.sin(2 * k);
+        k += 0.01;
+    });
     
     return scene;
 };
