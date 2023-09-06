@@ -36,6 +36,16 @@ var createScene = function () {
     mat.useAlphaFromDiffuseTexture = true;
     mat.diffuseColor = new BABYLON.Color3(0.47, 0, 0);
     sphere.material = mat;
+
+    // Texture setup for grass material
+    var grass = new BABYLON.StandardMaterial("grass", scene);
+    grass.ambientTexture = new BABYLON.Texture("textures/grass.png", scene);
+    grass.diffuseColor = new BABYLON.Color3(1, 0, 0);
+
+    // Create and position cylinders with grass texture
+    var shape = BABYLON.MeshBuilder.CreateCylinder("cylinder", { height: 0.3, diameter: 4 });
+    shape.material = grass;
+    shape.receiveShadows = true;
     
     return scene;
 };
