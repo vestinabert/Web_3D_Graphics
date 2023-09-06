@@ -23,6 +23,19 @@ var createScene = function () {
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
+
+    // Create a sphere
+    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
+    sphere.position.y = 1.5;
+    
+    // Material setup for the sphere
+    var mat = new BABYLON.StandardMaterial("mat", scene);
+    mat.diffuseTexture = new BABYLON.Texture("textures/cloud.png", scene);
+    mat.diffuseTexture.hasAlpha = true;
+    mat.transparencyMode = BABYLON.Material.MATERIAL_ALPHATESTANDBLEND;
+    mat.useAlphaFromDiffuseTexture = true;
+    mat.diffuseColor = new BABYLON.Color3(0.47, 0, 0);
+    sphere.material = mat;
     
     return scene;
 };
